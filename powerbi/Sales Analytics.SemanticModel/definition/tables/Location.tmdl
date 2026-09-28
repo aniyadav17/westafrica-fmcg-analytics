@@ -1,0 +1,65 @@
+/// Warehouses and supermarkets by country.
+table Location
+	lineageTag: 00fbf273-4796-44ca-ac17-4094f1647d61
+
+	column 'Location ID'
+		dataType: string
+		lineageTag: e73b3b39-c848-4683-ae89-8843bae1769e
+		summarizeBy: none
+		sourceColumn: Location ID
+
+	column 'Location Name'
+		dataType: string
+		lineageTag: 0f549c4b-48c3-4ffc-9236-1336f80e69b7
+		summarizeBy: none
+		sourceColumn: Location Name
+
+	column 'Location Type'
+		dataType: string
+		lineageTag: 3fbb1db9-d53c-4204-87ae-b06e233183f9
+		summarizeBy: none
+		sourceColumn: Location Type
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: 5ce6a8d5-e71e-4b0f-97e7-f1e47415f8da
+		summarizeBy: none
+		sourceColumn: Country Code
+
+	column Country
+		dataType: string
+		lineageTag: 4332c215-bf72-44ca-ab87-3a0bb0cdb258
+		summarizeBy: none
+		sourceColumn: Country
+
+	column City
+		dataType: string
+		lineageTag: 9917cbee-915f-4f96-ba2a-84f62b33ac44
+		summarizeBy: none
+		sourceColumn: City
+
+	column 'Opening Date'
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: 52da23ef-54d1-4c36-a304-d573a2c08bac
+		summarizeBy: none
+		sourceColumn: Opening Date
+
+	column 'Warehouse ID'
+		dataType: string
+		isHidden
+		lineageTag: 86f10429-5af6-442b-afbb-f00b7bfc8b25
+		summarizeBy: none
+		sourceColumn: Warehouse ID
+
+	partition Location = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_location.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Location ID", type text}, {"Location Name", type text}, {"Location Type", type text}, {"Country Code", type text}, {"Country", type text}, {"City", type text}, {"Opening Date", type date}, {"Warehouse ID", type text}}, "en-US")
+				in
+				    Typed

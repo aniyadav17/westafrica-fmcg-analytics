@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
+  "pageOrder": [
+    "p1_overview",
+    "p2_market_channel",
+    "p3_supermarket",
+    "p4_b2b",
+    "p5_product"
+  ],
+  "activePageName": "p1_overview"
+}

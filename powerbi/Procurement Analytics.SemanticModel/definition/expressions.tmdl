@@ -1,0 +1,5 @@
+/// Folder holding the CSV extracts produced by data/generate_data.py.
+/// Set this once per machine: Home > Transform data > Edit parameters.
+expression DataFolder = "C:\westafrica-fmcg-analytics\data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: db70843f-6a9e-420c-8305-0c2a21fe6517
+

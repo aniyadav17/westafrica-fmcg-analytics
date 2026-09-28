@@ -1,0 +1,90 @@
+/// Purchase order lines with FOB and landed unit cost.
+table 'PO Lines'
+	lineageTag: f03a3f8e-884a-4de2-a926-e4ae2f48f940
+
+	column 'PO No'
+		dataType: string
+		isHidden
+		lineageTag: aa51b89c-a440-43b1-950c-0948878cc2f5
+		summarizeBy: none
+		sourceColumn: PO No
+
+	column 'PO Date'
+		dataType: dateTime
+		isHidden
+		lineageTag: 7caebe76-0e2a-4654-a3ba-5efaa9cec8f7
+		summarizeBy: none
+		sourceColumn: PO Date
+
+	column 'Supplier ID'
+		dataType: string
+		isHidden
+		lineageTag: 3abfbbb4-e9e7-4de0-a23a-bd341141525c
+		summarizeBy: none
+		sourceColumn: Supplier ID
+
+	column 'Warehouse ID'
+		dataType: string
+		isHidden
+		lineageTag: 8ac71ecc-cabc-42b3-9769-8121f306788e
+		summarizeBy: none
+		sourceColumn: Warehouse ID
+
+	column 'SKU ID'
+		dataType: string
+		isHidden
+		lineageTag: d0e6575f-ba49-4125-8d74-b7d09fcd92ce
+		summarizeBy: none
+		sourceColumn: SKU ID
+
+	column 'Qty Ordered Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 655d2ee5-0f66-4710-b312-945027520a54
+		summarizeBy: sum
+		sourceColumn: Qty Ordered Cartons
+
+	column 'FOB Unit Cost USD'
+		dataType: double
+		formatString: \$#,##0.00
+		lineageTag: 4e616a89-f463-45cc-92e6-73935ab76626
+		summarizeBy: sum
+		sourceColumn: FOB Unit Cost USD
+
+	column 'FOB Value USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: e2e9467e-8bab-4763-ae7b-7a2188771a45
+		summarizeBy: sum
+		sourceColumn: FOB Value USD
+
+	column 'Landed Unit Cost USD'
+		dataType: double
+		formatString: \$#,##0.00
+		lineageTag: 5a43e08f-83e0-4f7e-aeda-aa6f3b69828f
+		summarizeBy: sum
+		sourceColumn: Landed Unit Cost USD
+
+	column 'Qty Received Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 9d6329d0-341b-47a4-b877-3209bd5107a9
+		summarizeBy: sum
+		sourceColumn: Qty Received Cartons
+
+	column Status
+		dataType: string
+		lineageTag: d6e0a44e-bdf7-4075-b332-086b71cc3ddf
+		summarizeBy: none
+		sourceColumn: Status
+
+	partition 'PO Lines' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fact_po_lines.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"PO No", type text}, {"PO Date", type date}, {"Supplier ID", type text}, {"Warehouse ID", type text}, {"SKU ID", type text}, {"Qty Ordered Cartons", Int64.Type}, {"FOB Unit Cost USD", type number}, {"FOB Value USD", type number}, {"Landed Unit Cost USD", type number}, {"Qty Received Cartons", Int64.Type}, {"Status", type text}}, "en-US")
+				in
+				    Typed

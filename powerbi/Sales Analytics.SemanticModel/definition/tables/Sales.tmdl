@@ -1,0 +1,130 @@
+/// Sales lines: B2B invoices (daily) and supermarket POS summaries (weekly), with credit notes.
+table Sales
+	lineageTag: 1e702665-594a-4e6f-a35c-376140c39c64
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: dd-MMM-yyyy
+		lineageTag: 6222ef03-1bf2-40b2-93b5-f41e29fc6a88
+		summarizeBy: none
+		sourceColumn: Date
+
+	column Channel
+		dataType: string
+		lineageTag: 39ea5f3a-fd60-4ff8-85b7-18a12bdba9bf
+		summarizeBy: none
+		sourceColumn: Channel
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: b39432a1-228e-4b5d-84c7-882c6d29962f
+		summarizeBy: none
+		sourceColumn: Country Code
+
+	column Country
+		dataType: string
+		lineageTag: 70048a5b-9d8f-4e03-9d11-0116d344ba27
+		summarizeBy: none
+		sourceColumn: Country
+
+	column 'Location ID'
+		dataType: string
+		isHidden
+		lineageTag: 6e6ea818-69bb-40c4-b911-1a3d92f3fa40
+		summarizeBy: none
+		sourceColumn: Location ID
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: b44b8050-e0a3-4ce4-a6ae-6efcea06de51
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+	column 'Customer Segment'
+		dataType: string
+		lineageTag: 0c16be57-e9ad-4b4b-b574-2ed6b9808251
+		summarizeBy: none
+		sourceColumn: Customer Segment
+
+	column 'SKU ID'
+		dataType: string
+		isHidden
+		lineageTag: 82024cf3-3088-452a-8371-0b9f6ad50a34
+		summarizeBy: none
+		sourceColumn: SKU ID
+
+	column 'Document No'
+		dataType: string
+		lineageTag: ffd60691-1b15-4e6c-a3ab-9102a34f6f87
+		summarizeBy: none
+		sourceColumn: Document No
+
+	column 'Qty Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: c8c4839e-a4b1-421a-9432-914043a3f229
+		summarizeBy: sum
+		sourceColumn: Qty Cartons
+
+	column 'Qty Units'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: d319ec4f-8f85-4b39-98b7-3fc344f6df28
+		summarizeBy: sum
+		sourceColumn: Qty Units
+
+	column 'Gross Sales USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: 380fa595-5e6e-4e02-a7bc-cc86d5a55754
+		summarizeBy: sum
+		sourceColumn: Gross Sales USD
+
+	column 'Discount USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: 759a530f-f356-4113-bc84-17ee2a4d4df9
+		summarizeBy: sum
+		sourceColumn: Discount USD
+
+	column 'Net Sales USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: d16ec553-0dc0-428c-9127-f7a226bf3bdd
+		summarizeBy: sum
+		sourceColumn: Net Sales USD
+
+	column 'COGS USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: 84dfba22-a73a-4b6f-9f59-b6fdab247c10
+		summarizeBy: sum
+		sourceColumn: COGS USD
+
+	column 'Transaction Type'
+		dataType: string
+		lineageTag: d23063be-16d6-4c46-9147-8bc01173de7f
+		summarizeBy: none
+		sourceColumn: Transaction Type
+
+	column 'Gross Margin USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: d35ba305-d7fc-472a-b652-977b3824a8d9
+		summarizeBy: sum
+		sourceColumn: Gross Margin USD
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Binary.Decompress(File.Contents(DataFolder & "fact_sales.csv.gz"), Compression.GZip), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Blanks = Table.ReplaceValue(Renamed, "", null, Replacer.ReplaceValue, {"Customer ID"}),
+				    Typed = Table.TransformColumnTypes(Blanks, {{"Date", type date}, {"Channel", type text}, {"Country Code", type text}, {"Country", type text}, {"Location ID", type text}, {"Customer ID", type text}, {"Customer Segment", type text}, {"SKU ID", type text}, {"Document No", type text}, {"Qty Cartons", Int64.Type}, {"Qty Units", Int64.Type}, {"Gross Sales USD", type number}, {"Discount USD", type number}, {"Net Sales USD", type number}, {"COGS USD", type number}, {"Transaction Type", type text}, {"Gross Margin USD", type number}}, "en-US")
+				in
+				    Typed

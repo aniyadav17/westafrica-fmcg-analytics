@@ -1,0 +1,107 @@
+/// SKU master: Category > Sub-category > Brand > SKU, with import duty rate and pack data.
+table Product
+	lineageTag: 1d50b21b-1292-4867-8e0f-cc2b1cc9c474
+
+	column 'SKU ID'
+		dataType: string
+		lineageTag: d8ada17a-52cc-45cb-beba-309ff09621e6
+		summarizeBy: none
+		sourceColumn: SKU ID
+
+	column 'SKU Code'
+		dataType: string
+		lineageTag: b44f4e14-00b1-4a85-aeca-774b3c104976
+		summarizeBy: none
+		sourceColumn: SKU Code
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: ffa5f355-788b-4b1b-a49f-831e4e391d35
+		summarizeBy: none
+		sourceColumn: Product Name
+
+	column Brand
+		dataType: string
+		lineageTag: f8887ca1-4963-44c1-bc62-dd306893870a
+		summarizeBy: none
+		sourceColumn: Brand
+
+	column Category
+		dataType: string
+		lineageTag: 77402c8e-c988-4ac3-81f3-aafdbe6f5b61
+		summarizeBy: none
+		sourceColumn: Category
+
+	column 'Sub Category'
+		dataType: string
+		lineageTag: ee2b594e-fabc-4776-9e82-789b15fd9d27
+		summarizeBy: none
+		sourceColumn: Sub Category
+
+	column Variant
+		dataType: string
+		lineageTag: bee611ae-1933-4c29-a690-22f81d93ac81
+		summarizeBy: none
+		sourceColumn: Variant
+
+	column 'Pack Size'
+		dataType: string
+		lineageTag: f8dde51e-fac9-4069-b85c-e8c3e6c22ba7
+		summarizeBy: none
+		sourceColumn: Pack Size
+
+	column 'Units Per Carton'
+		dataType: int64
+		lineageTag: 36b8e962-ea0b-4001-bc1a-1df782859c18
+		summarizeBy: none
+		sourceColumn: Units Per Carton
+
+	column 'CBM Per Carton'
+		dataType: double
+		formatString: 0.000
+		lineageTag: eecee330-ba8a-4f3a-8849-b107ad6a130a
+		summarizeBy: none
+		sourceColumn: CBM Per Carton
+
+	column 'Duty Rate Pct'
+		dataType: double
+		formatString: 0
+		lineageTag: 0d876036-6505-4ef7-910e-5771c984884f
+		summarizeBy: none
+		sourceColumn: Duty Rate Pct
+
+	column 'Shelf Life Days'
+		dataType: int64
+		lineageTag: 78fea9f8-325e-4535-ba92-7c2414490e7f
+		summarizeBy: none
+		sourceColumn: Shelf Life Days
+
+	column 'Origin Country'
+		dataType: string
+		lineageTag: 742b949c-98c5-401d-8a68-3e90886e272c
+		summarizeBy: none
+		sourceColumn: Origin Country
+
+	column 'Supplier ID'
+		dataType: string
+		isHidden
+		lineageTag: 2731e4e5-dc43-43fc-b404-d95e10d56127
+		summarizeBy: none
+		sourceColumn: Supplier ID
+
+	column Status
+		dataType: string
+		lineageTag: f74e6546-102d-4531-b7c1-893608ef77ba
+		summarizeBy: none
+		sourceColumn: Status
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_product.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"SKU ID", type text}, {"SKU Code", type text}, {"Product Name", type text}, {"Brand", type text}, {"Category", type text}, {"Sub Category", type text}, {"Variant", type text}, {"Pack Size", type text}, {"Units Per Carton", Int64.Type}, {"CBM Per Carton", type number}, {"Duty Rate Pct", type number}, {"Shelf Life Days", Int64.Type}, {"Origin Country", type text}, {"Supplier ID", type text}, {"Status", type text}}, "en-US")
+				in
+				    Typed

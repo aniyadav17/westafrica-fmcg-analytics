@@ -1,0 +1,49 @@
+/// Monthly sales budget by country and channel.
+table Target
+	lineageTag: 451dcbfd-05e9-4601-8026-5636368394f3
+
+	column 'Month Date'
+		dataType: dateTime
+		isHidden
+		lineageTag: 378733cc-ced2-4313-bde4-ddae592ffcb1
+		summarizeBy: none
+		sourceColumn: Month Date
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: 49a533a6-abb7-4f39-a43a-c71fdd0eee03
+		summarizeBy: none
+		sourceColumn: Country Code
+
+	column Country
+		dataType: string
+		isHidden
+		lineageTag: 7b6c8f22-08b5-4a78-9284-a0ce14e43b16
+		summarizeBy: none
+		sourceColumn: Country
+
+	column Channel
+		dataType: string
+		isHidden
+		lineageTag: ef69d245-06a6-41c9-bea6-d93a1f84935c
+		summarizeBy: none
+		sourceColumn: Channel
+
+	column 'Target USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: 43fa39af-4d1d-42d9-afe4-887b3c1bf123
+		summarizeBy: sum
+		sourceColumn: Target USD
+
+	partition Target = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fact_sales_target.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Month Date", type date}, {"Country Code", type text}, {"Country", type text}, {"Channel", type text}, {"Target USD", type number}}, "en-US")
+				in
+				    Typed

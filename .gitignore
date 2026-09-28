@@ -1,0 +1,13 @@
+# generated data extracts (run: python data/generate_data.py)
+data/*.csv
+data/*.csv.gz
+
+# Power BI Desktop local caches
+**/.pbi/
+**/*.pbix
+**/localSettings.json
+**/cache.abf
+
+# python
+__pycache__/
+*.pyc

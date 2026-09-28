@@ -1,0 +1,47 @@
+relationship Purchase_Orders_PO_Date_Date_Date
+	fromColumn: 'Purchase Orders'.'PO Date'
+	toColumn: Date.Date
+
+relationship Purchase_Orders_Supplier_ID_Supplier_Supplier_ID
+	fromColumn: 'Purchase Orders'.'Supplier ID'
+	toColumn: Supplier.'Supplier ID'
+
+relationship Purchase_Orders_Warehouse_ID_Location_Location_ID
+	fromColumn: 'Purchase Orders'.'Warehouse ID'
+	toColumn: Location.'Location ID'
+
+relationship PO_Lines_PO_No_Purchase_Orders_PO_No
+	fromColumn: 'PO Lines'.'PO No'
+	toColumn: 'Purchase Orders'.'PO No'
+
+relationship PO_Lines_SKU_ID_Product_SKU_ID
+	fromColumn: 'PO Lines'.'SKU ID'
+	toColumn: Product.'SKU ID'
+
+relationship Shipments_Arrival_Date_Date_Date
+	fromColumn: Shipments.'Arrival Date'
+	toColumn: Date.Date
+
+relationship Shipments_Supplier_ID_Supplier_Supplier_ID
+	fromColumn: Shipments.'Supplier ID'
+	toColumn: Supplier.'Supplier ID'
+
+relationship Shipments_Warehouse_ID_Location_Location_ID
+	fromColumn: Shipments.'Warehouse ID'
+	toColumn: Location.'Location ID'
+
+relationship Landed_Cost_Shipment_No_Shipments_Shipment_No
+	fromColumn: 'Landed Cost'.'Shipment No'
+	toColumn: Shipments.'Shipment No'
+
+relationship Goods_Receipts_GRN_Date_Date_Date
+	fromColumn: 'Goods Receipts'.'GRN Date'
+	toColumn: Date.Date
+
+relationship Goods_Receipts_Warehouse_ID_Location_Location_ID
+	fromColumn: 'Goods Receipts'.'Warehouse ID'
+	toColumn: Location.'Location ID'
+
+relationship Goods_Receipts_SKU_ID_Product_SKU_ID
+	fromColumn: 'Goods Receipts'.'SKU ID'
+	toColumn: Product.'SKU ID'

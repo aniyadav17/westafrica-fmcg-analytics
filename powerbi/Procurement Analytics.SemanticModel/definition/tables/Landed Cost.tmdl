@@ -1,0 +1,70 @@
+/// Cost build-up per shipment: goods, freight, insurance, duty, clearing, inland, demurrage.
+table 'Landed Cost'
+	lineageTag: b11e1c36-7d79-4808-bef0-95d0fa2e8af6
+
+	column 'Shipment No'
+		dataType: string
+		isHidden
+		lineageTag: 9d2cd94c-c33f-4122-892c-fa9a5238d2b6
+		summarizeBy: none
+		sourceColumn: Shipment No
+
+	column 'PO No'
+		dataType: string
+		isHidden
+		lineageTag: 23bd69d2-d59a-4a50-b93d-3ba6cadd44a3
+		summarizeBy: none
+		sourceColumn: PO No
+
+	column 'Cost Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd-MMM-yyyy
+		lineageTag: 439ca18a-17f9-4573-911e-9ae7eff2b75d
+		summarizeBy: none
+		sourceColumn: Cost Date
+
+	column 'Warehouse ID'
+		dataType: string
+		isHidden
+		lineageTag: 5e065c8c-5875-4789-a7a3-0edafa875fa8
+		summarizeBy: none
+		sourceColumn: Warehouse ID
+
+	column Country
+		dataType: string
+		isHidden
+		lineageTag: 646f97e4-2bc5-48d3-8e39-5e1c309a7b68
+		summarizeBy: none
+		sourceColumn: Country
+
+	column 'Origin Country'
+		dataType: string
+		isHidden
+		lineageTag: e74048ad-ee28-4849-8c62-e63355717fcb
+		summarizeBy: none
+		sourceColumn: Origin Country
+
+	column 'Cost Component'
+		dataType: string
+		lineageTag: 1f95a58e-1d18-4e85-9668-0f8e50e86e16
+		summarizeBy: none
+		sourceColumn: Cost Component
+
+	column 'Amount USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: f58e1c0c-98bb-4fc9-b3c5-d9fee4fb7cbb
+		summarizeBy: sum
+		sourceColumn: Amount USD
+
+	partition 'Landed Cost' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fact_landed_cost.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Shipment No", type text}, {"PO No", type text}, {"Cost Date", type date}, {"Warehouse ID", type text}, {"Country", type text}, {"Origin Country", type text}, {"Cost Component", type text}, {"Amount USD", type number}}, "en-US")
+				in
+				    Typed

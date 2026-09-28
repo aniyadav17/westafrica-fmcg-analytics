@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "FMCG Sales Analytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c328faaa-c4f2-4094-a753-880a69258204"
+  }
+}

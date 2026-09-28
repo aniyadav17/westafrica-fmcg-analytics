@@ -1,0 +1,215 @@
+/// All report measures (the table itself holds no data).
+table KPI
+	lineageTag: 880a708f-246d-42d8-b976-2e95ae590465
+
+	/// Sales after discount and credit notes.
+	measure 'Net Sales' = SUM(Sales[Net Sales USD])
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: 5823a55f-0870-4665-81e1-4339a43e45be
+
+	measure 'Gross Sales' = SUM(Sales[Gross Sales USD])
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: 06da686e-564b-47ab-8dc0-b613b3eff8d5
+
+	measure Discount = SUM(Sales[Discount USD])
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: 01d6245d-ab22-4301-8c55-692f07e589d9
+
+	measure 'Discount %' = DIVIDE([Discount], [Gross Sales])
+		formatString: 0.0%
+		displayFolder: 1. Sales
+		lineageTag: fb1209d3-386a-41e1-8f79-5bde259702dd
+
+	measure 'Cartons Sold' = SUM(Sales[Qty Cartons])
+		formatString: #,##0
+		displayFolder: 1. Sales
+		lineageTag: be6037bd-3073-4e0b-a6db-2c6a9ec07b44
+
+	measure 'Units Sold' = SUM(Sales[Qty Units])
+		formatString: #,##0
+		displayFolder: 1. Sales
+		lineageTag: 76a861e8-bede-4b61-8218-f8da36c07943
+
+	measure 'Credit Notes' = -CALCULATE([Net Sales], KEEPFILTERS(Sales[Transaction Type] = "Credit Note"))
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: c2709dc0-e883-43e2-a520-d22c683f8fe8
+
+	measure 'Return %' = DIVIDE([Credit Notes], CALCULATE([Net Sales], KEEPFILTERS(Sales[Transaction Type] = "Sale")))
+		formatString: 0.0%
+		displayFolder: 1. Sales
+		lineageTag: 1c05e367-33af-4971-8d66-1f2e18fca71a
+
+	measure 'B2B Sales' = CALCULATE([Net Sales], KEEPFILTERS(Sales[Channel] = "B2B"))
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: 2f790a5b-1f29-402f-89b6-2dec5c31bda2
+
+	measure 'Supermarket Sales' = CALCULATE([Net Sales], KEEPFILTERS(Sales[Channel] = "Supermarket"))
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: b835df77-28b6-4163-a402-4f0a9367c254
+
+	measure 'Net Sales LY' = CALCULATE([Net Sales], SAMEPERIODLASTYEAR('Date'[Date]))
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: 31e6b518-134d-498c-8480-fbb06ad17c95
+
+	measure 'Growth %' = VAR _ly = [Net Sales LY] RETURN IF(NOT ISBLANK(_ly) && _ly <> 0, DIVIDE([Net Sales] - _ly, _ly))
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 1. Sales
+		lineageTag: f25ea843-fd7d-4bb1-b6eb-ca8b4cefccf3
+
+	/// Monthly budget set by country and channel.
+	measure Target = SUM(Target[Target USD])
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: 58818aea-c802-487f-bace-68e24cd9c5fd
+
+	measure 'Achievement %' = DIVIDE([Net Sales], [Target])
+		formatString: 0.0%
+		displayFolder: 1. Sales
+		lineageTag: 801bc278-9075-4441-930a-314fa5fcc03a
+
+	measure 'Variance to Target' = IF(NOT ISBLANK([Target]), [Net Sales] - [Target])
+		formatString: \$#,##0
+		displayFolder: 1. Sales
+		lineageTag: 3bd259b7-c88d-49ca-b9cd-e2122048ee0b
+
+	measure 'Contribution %' = DIVIDE([Net Sales], CALCULATE([Net Sales], ALLSELECTED()))
+		formatString: 0.0%
+		displayFolder: 1. Sales
+		lineageTag: b70db871-d234-46df-86e8-466a84bce191
+
+	/// Cost of goods sold at landed cost.
+	measure COGS = SUM(Sales[COGS USD])
+		formatString: \$#,##0
+		displayFolder: 2. Margin
+		lineageTag: bcfbcf48-78be-498c-b2ef-bc80e9b5ad09
+
+	measure 'Gross Margin' = SUM(Sales[Gross Margin USD])
+		formatString: \$#,##0
+		displayFolder: 2. Margin
+		lineageTag: 6152b222-13aa-45ab-882a-bed928919ed7
+
+	measure 'Gross Margin %' = DIVIDE([Gross Margin], [Net Sales])
+		formatString: 0.0%
+		displayFolder: 2. Margin
+		lineageTag: 60dea3fb-b1ae-483f-b2f8-365b3ea15b57
+
+	measure 'Gross Margin LY' = CALCULATE([Gross Margin], SAMEPERIODLASTYEAR('Date'[Date]))
+		formatString: \$#,##0
+		displayFolder: 2. Margin
+		lineageTag: 39629bcc-4ac4-4ede-aeed-d7fa59f21257
+
+	measure 'Margin per Carton' = DIVIDE([Gross Margin], [Cartons Sold])
+		formatString: \$#,##0.00
+		displayFolder: 2. Margin
+		lineageTag: a3e487d6-6aba-4e7b-beca-1ad9d9d62fcd
+
+	measure Invoices = CALCULATE(DISTINCTCOUNT(Sales[Document No]), KEEPFILTERS(Sales[Channel] = "B2B"), KEEPFILTERS(Sales[Transaction Type] = "Sale"))
+		formatString: #,##0
+		displayFolder: 3. Customers & Stores
+		lineageTag: ba0014d2-c15a-4ca3-b86a-363a8ec744d1
+
+	measure 'Avg Invoice Value' = DIVIDE([B2B Sales], [Invoices])
+		formatString: \$#,##0
+		displayFolder: 3. Customers & Stores
+		lineageTag: 86bbcd81-dd45-4396-9a03-f5d9fe90021c
+
+	/// B2B customers invoiced; supermarket rows carry no customer, so the blank is not counted.
+	measure 'Customers Billed' = DISTINCTCOUNTNOBLANK(Sales[Customer ID])
+		formatString: #,##0
+		displayFolder: 3. Customers & Stores
+		lineageTag: 1d8a612e-13eb-4875-b8b6-38ba52c9a441
+
+	measure 'Active SKUs' = DISTINCTCOUNT(Sales[SKU ID])
+		formatString: #,##0
+		displayFolder: 3. Customers & Stores
+		lineageTag: c7a54113-bbc1-4aaa-bc2d-f8a64f4cff7e
+
+	measure 'Stores Trading' = CALCULATE(DISTINCTCOUNT(Sales[Location ID]), KEEPFILTERS(Sales[Channel] = "Supermarket"))
+		formatString: #,##0
+		displayFolder: 3. Customers & Stores
+		lineageTag: 48b3f199-5fb1-4c52-845b-64df732634d6
+
+	measure 'Sales per Store' = DIVIDE([Supermarket Sales], [Stores Trading])
+		formatString: \$#,##0
+		displayFolder: 3. Customers & Stores
+		lineageTag: 576ac9c6-ea8e-47b0-94bd-6de0eefe92af
+
+	measure 'Lines per Invoice' = DIVIDE(CALCULATE(COUNTROWS(Sales), KEEPFILTERS(Sales[Channel] = "B2B")), [Invoices])
+		formatString: #,##0.0
+		displayFolder: 3. Customers & Stores
+		lineageTag: 95f06fb3-e26c-44c5-aff4-3ddbe362fc53
+
+	measure 'Net Sales (USD m)' = DIVIDE([Net Sales], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: 9f98af00-eb12-4f26-96d6-2bd95f36d4f6
+
+	measure 'Net Sales (USD k)' = DIVIDE([Net Sales], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 9e482cd7-37b7-4b89-b87e-27e2f6080a52
+
+	measure 'B2B Sales (USD k)' = DIVIDE([B2B Sales], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 58036c02-2e35-44f8-8b97-a1a2b542bfef
+
+	measure 'Supermarket Sales (USD k)' = DIVIDE([Supermarket Sales], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 59c3d7c8-9a4f-4843-b4bf-b6f3efec66e5
+
+	measure 'Net Sales LY (USD k)' = DIVIDE([Net Sales LY], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: ce8c63dc-c21b-409d-89d0-282ed2a158d8
+
+	measure 'Target (USD k)' = DIVIDE([Target], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 9e5ac0a0-9775-409d-a056-476acdd0b605
+
+	measure 'Gross Margin (USD k)' = DIVIDE([Gross Margin], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: dcd0b58d-8c0f-4a0b-ae7c-dc621ea28b78
+
+	measure 'Variance (USD k)' = DIVIDE([Variance to Target], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 7befc130-f892-4b9d-b1d0-4550ce0354f5
+
+	measure 'Gross Margin (USD m)' = DIVIDE([Gross Margin], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: 1d354a41-78f2-4920-b32d-184d61842fd8
+
+	measure 'Supermarket Sales (USD m)' = DIVIDE([Supermarket Sales], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: 0f7812db-aaa9-4fe9-b4eb-5cffc0ce1b65
+
+	measure 'B2B Sales (USD m)' = DIVIDE([B2B Sales], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: 7d24bf3a-c0c9-41b4-9539-a0ac7567ab8e
+
+	column KPI
+		dataType: string
+		isHidden
+		lineageTag: b9826aa2-44ba-43b7-a0e4-009f4efd6534
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [KPI]
+
+	partition KPI = calculated
+		mode: import
+		source =
+				ROW("KPI", BLANK())

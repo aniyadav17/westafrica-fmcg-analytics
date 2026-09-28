@@ -1,0 +1,276 @@
+/// All report measures (the table itself holds no data).
+table KPI
+	lineageTag: 0345bdb2-e61b-463f-9155-ad8dbac5c9cf
+
+	/// Value of purchase orders raised (FOB, before freight and duty).
+	measure 'PO Value' = SUM('Purchase Orders'[FOB Value USD])
+		formatString: \$#,##0
+		displayFolder: 1. Purchasing
+		lineageTag: 5da2ffe9-0c37-4170-a54f-a24da261199b
+
+	measure 'PO Count' = DISTINCTCOUNT('Purchase Orders'[PO No])
+		formatString: #,##0
+		displayFolder: 1. Purchasing
+		lineageTag: 1c24cb7d-22e0-4660-8350-16564ad61efc
+
+	measure Containers = SUM('Purchase Orders'[Containers])
+		formatString: #,##0
+		displayFolder: 1. Purchasing
+		lineageTag: a9590f11-2de5-4194-a10b-3da29e3d4814
+
+	measure 'Cartons Ordered' = SUM('PO Lines'[Qty Ordered Cartons])
+		formatString: #,##0
+		displayFolder: 1. Purchasing
+		lineageTag: 2dd14a51-93b2-411c-abd2-7eb30cb3718c
+
+	measure 'Cartons Received' = SUM('Goods Receipts'[Qty Received Cartons])
+		formatString: #,##0
+		displayFolder: 1. Purchasing
+		lineageTag: 4b4a4978-d83f-400f-8653-cd38b3e61e47
+
+	measure 'Goods Received Value' = SUM('Goods Receipts'[Landed Value USD])
+		formatString: \$#,##0
+		displayFolder: 1. Purchasing
+		lineageTag: f1a0b39e-8d13-4f7c-b1b0-a650cf186e38
+
+	measure 'Suppliers Used' = DISTINCTCOUNT('Purchase Orders'[Supplier ID])
+		formatString: #,##0
+		displayFolder: 1. Purchasing
+		lineageTag: 6af79007-e074-4b6e-97f8-25fa839aad34
+
+	measure 'Avg PO Value' = DIVIDE([PO Value], [PO Count])
+		formatString: \$#,##0
+		displayFolder: 1. Purchasing
+		lineageTag: ba8175cc-3930-464b-9b2c-a03f40ab215b
+
+	measure 'Avg FOB per Carton' = DIVIDE(SUM('PO Lines'[FOB Value USD]), SUM('PO Lines'[Qty Ordered Cartons]))
+		formatString: \$#,##0.00
+		displayFolder: 1. Purchasing
+		lineageTag: b474eba0-cc82-4254-8f8f-9aaf1052cfd4
+
+	measure 'Avg Landed per Carton' = DIVIDE(SUMX('PO Lines', 'PO Lines'[Qty Ordered Cartons] * 'PO Lines'[Landed Unit Cost USD]), SUM('PO Lines'[Qty Ordered Cartons]))
+		formatString: \$#,##0.00
+		displayFolder: 1. Purchasing
+		lineageTag: 4fdeb289-3e3f-49c1-85b1-93d724dd9208
+
+	/// All cost components of the shipments, including the goods themselves.
+	measure 'Import Cost' = SUM('Landed Cost'[Amount USD])
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: 8ca7f3b2-9658-42e4-97f2-bb83be073fbf
+
+	measure 'Goods Cost' = CALCULATE([Import Cost], KEEPFILTERS('Landed Cost'[Cost Component] = "FOB / Goods"))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: ff1f8801-ccce-4448-be14-47841c651c5c
+
+	measure 'Freight Cost' = CALCULATE([Import Cost], KEEPFILTERS('Landed Cost'[Cost Component] = "Ocean Freight"))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: 2cceea6f-a979-4743-8c9a-d63eb6ced910
+
+	measure 'Duty Cost' = CALCULATE([Import Cost], KEEPFILTERS('Landed Cost'[Cost Component] = "Customs Duty"))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: 3175ba5a-4e5b-43bc-81f8-38f7933615da
+
+	measure 'Clearing Cost' = CALCULATE([Import Cost], KEEPFILTERS('Landed Cost'[Cost Component] = "Clearing & Port Charges"))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: 3c8146ea-a721-4959-9727-9cf867ed841f
+
+	measure 'Inland Cost' = CALCULATE([Import Cost], KEEPFILTERS('Landed Cost'[Cost Component] = "Inland Transport"))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: 008a1c30-822d-40dd-aec8-b5b84c891284
+
+	measure 'Demurrage Cost' = CALCULATE([Import Cost], KEEPFILTERS('Landed Cost'[Cost Component] = "Demurrage"))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: d66e924d-76f9-4886-95b1-74a01612ed60
+
+	/// Total cost of imported goods delivered into the warehouse.
+	measure 'Landed Value' = SUM(Shipments[Landed Value USD])
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: dac95c5e-d984-468c-9246-1185ae102244
+
+	measure 'Shipment FOB Value' = SUM(Shipments[FOB Value USD])
+		formatString: \$#,##0
+		isHidden
+		displayFolder: 2. Landed Cost
+		lineageTag: 0de71049-8dce-4422-b8dd-ad1491f95c42
+
+	/// How much freight, duty and clearing add on top of the FOB price of the goods.
+	measure 'Landed Cost Uplift %' = DIVIDE([Landed Value] - [Shipment FOB Value], [Shipment FOB Value])
+		formatString: 0.0%
+		displayFolder: 2. Landed Cost
+		lineageTag: e181cd3e-cc38-4ba4-bb50-fb9bb28bc6a6
+
+	measure 'Freight % of Goods' = DIVIDE([Freight Cost], [Goods Cost])
+		formatString: 0.0%
+		displayFolder: 2. Landed Cost
+		lineageTag: e3cbc4fc-22ac-48c8-b10b-4e96b8a13caf
+
+	measure 'Duty % of Goods' = DIVIDE([Duty Cost], [Goods Cost])
+		formatString: 0.0%
+		displayFolder: 2. Landed Cost
+		lineageTag: 6f48528c-a367-417b-bc88-f8d6c9623533
+
+	measure 'Cost per Container' = DIVIDE([Landed Value], SUM(Shipments[Containers]))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: c6abfc63-9c5e-461f-b27e-c2ef7fdaec30
+
+	measure 'Landed Value LY' = CALCULATE([Landed Value], SAMEPERIODLASTYEAR('Date'[Date]))
+		formatString: \$#,##0
+		displayFolder: 2. Landed Cost
+		lineageTag: ec753ed2-1dfc-441a-b667-17cbeb766eab
+
+	measure 'Import Growth %' = VAR _ly = [Landed Value LY] RETURN IF(NOT ISBLANK(_ly) && _ly <> 0, DIVIDE([Landed Value] - _ly, _ly))
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2. Landed Cost
+		lineageTag: f0c75911-b80d-4ffc-93a3-69321612ba27
+
+	measure Shipments = COUNTROWS(Shipments)
+		formatString: #,##0
+		displayFolder: 3. Supplier Performance
+		lineageTag: 4cf392f2-7b9a-447e-b5db-113b618671ad
+
+	measure 'Arrived Shipments' = CALCULATE([Shipments], KEEPFILTERS(Shipments[Status] <> "In Transit"))
+		formatString: #,##0
+		isHidden
+		displayFolder: 3. Supplier Performance
+		lineageTag: 0006f9a0-28cf-45d1-968b-b108e2383d58
+
+	/// Shipments already booked into the warehouse; the service measures are calculated on these.
+	measure 'Received Shipments' = CALCULATE([Shipments], KEEPFILTERS(Shipments[Status] = "Received"))
+		formatString: #,##0
+		displayFolder: 3. Supplier Performance
+		lineageTag: 71bfa63f-164a-4457-8562-98b1d712a9fc
+
+	/// Shipments arriving within 3 days of the promised ETA. Shipments still at sea are excluded.
+	measure 'On-Time %' = DIVIDE(CALCULATE([Shipments], KEEPFILTERS(Shipments[On Time] = TRUE())), [Arrived Shipments])
+		formatString: 0.0%
+		displayFolder: 3. Supplier Performance
+		lineageTag: d487c1d1-9061-455d-bf7f-5bce93ff36a1
+
+	measure 'In-Full %' = DIVIDE(CALCULATE([Shipments], KEEPFILTERS(Shipments[In Full] = TRUE())), [Received Shipments])
+		formatString: 0.0%
+		displayFolder: 3. Supplier Performance
+		lineageTag: e6e346ba-fa0b-4c50-881a-a4fd4a48e0cd
+
+	/// On time and in full: the headline supplier service measure, on received shipments.
+	measure 'OTIF %' = DIVIDE(CALCULATE([Shipments], KEEPFILTERS(Shipments[OTIF] = TRUE())), [Received Shipments])
+		formatString: 0.0%
+		displayFolder: 3. Supplier Performance
+		lineageTag: 4548e453-58c8-4d2a-a364-73ffab5ad6bc
+
+	/// PO date to warehouse receipt.
+	measure 'Avg Lead Time (days)' = AVERAGE(Shipments[Total Lead Time Days])
+		formatString: 0.0
+		displayFolder: 3. Supplier Performance
+		lineageTag: 2651c3fb-191d-4e2d-b472-0661a57a7d7d
+
+	measure 'Avg Transit Days' = AVERAGE(Shipments[Transit Days])
+		formatString: 0.0
+		displayFolder: 3. Supplier Performance
+		lineageTag: 0cfdd209-f248-410f-92f7-d8ab15335651
+
+	/// Port arrival to customs clearance.
+	measure 'Avg Clearance Days' = AVERAGE(Shipments[Clearance Days])
+		formatString: 0.0
+		displayFolder: 3. Supplier Performance
+		lineageTag: 3d358b53-7c62-4105-87b5-d6877490a539
+
+	/// Actual arrival vs promised ETA.
+	measure 'Avg Delay (days)' = AVERAGE(Shipments[Delay Days])
+		formatString: 0.0
+		displayFolder: 3. Supplier Performance
+		lineageTag: 05bbe5aa-23cc-43f3-b74e-c865025a2347
+
+	/// Cartons received against cartons ordered on the same receipt, so a PO raised in one period and received in the next cannot distort it.
+	measure 'Fill Rate %' = DIVIDE([Cartons Received], SUM('Goods Receipts'[Qty Ordered Cartons]))
+		formatString: 0.0%
+		displayFolder: 3. Supplier Performance
+		lineageTag: f807b22b-8006-4a5f-b8ab-e0a59cb43970
+
+	/// Shipments still at sea or at the port. This is a position, so it ignores the period filter.
+	measure 'Open Shipments' = CALCULATE([Shipments], KEEPFILTERS(Shipments[Status] <> "Received"), REMOVEFILTERS('Date'))
+		formatString: #,##0
+		displayFolder: 3. Supplier Performance
+		lineageTag: 35c4eb08-abbd-428e-8364-a3bcc53bc600
+
+	/// Value of the goods that are still on the water or waiting at the port.
+	measure 'Open Pipeline Value' = CALCULATE([Landed Value], KEEPFILTERS(Shipments[Status] <> "Received"), REMOVEFILTERS('Date'))
+		formatString: \$#,##0
+		displayFolder: 3. Supplier Performance
+		lineageTag: b2a469f9-8392-4d06-a5c7-244d108191a6
+
+	measure 'Landed Value (USD m)' = DIVIDE([Landed Value], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: 51a4a1a1-89a4-4ab8-8eb1-fe7ea1929d08
+
+	measure 'PO Value (USD m)' = DIVIDE([PO Value], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: 746941e0-ab00-4bb2-b06a-eeb161aabc17
+
+	measure 'Open Pipeline (USD m)' = DIVIDE([Open Pipeline Value], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: a9fdc34b-149f-4f05-b42f-2ab6693ce653
+
+	measure 'Landed Value (USD k)' = DIVIDE([Landed Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 2d86f8c2-39c8-49d7-b6e6-058de7b1308f
+
+	measure 'Import Cost (USD k)' = DIVIDE([Import Cost], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 8422f327-bfb1-4e4b-8c27-7fe5abb146e3
+
+	measure 'Freight Cost (USD k)' = DIVIDE([Freight Cost], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 4f9e0a58-6465-40a3-99d1-9ede932b06ef
+
+	measure 'Duty Cost (USD k)' = DIVIDE([Duty Cost], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 04234470-efbc-4baa-8b33-987ef984b8fb
+
+	measure 'Clearing Cost (USD k)' = DIVIDE([Clearing Cost], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: c4b5efd2-b771-451a-a1dc-dd06e30376da
+
+	measure 'Inland Cost (USD k)' = DIVIDE([Inland Cost], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 8005b6be-0a5a-4d64-ba12-692a614c9675
+
+	measure 'Demurrage Cost (USD k)' = DIVIDE([Demurrage Cost], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: cea7a39b-c437-41fc-8739-5ac66460153d
+
+	measure 'Goods Received (USD k)' = DIVIDE([Goods Received Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: d2cf4764-0e9d-4eb6-bee2-2271b09163c9
+
+	column KPI
+		dataType: string
+		isHidden
+		lineageTag: f6acd6f4-c2d6-40bf-b39d-6b0d46df5dbb
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [KPI]
+
+	partition KPI = calculated
+		mode: import
+		source =
+				ROW("KPI", BLANK())

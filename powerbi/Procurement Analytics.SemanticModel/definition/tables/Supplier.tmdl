@@ -1,0 +1,63 @@
+/// Overseas suppliers with origin country, port of loading and terms.
+table Supplier
+	lineageTag: 2e4405c3-b58f-4e71-b4b2-8016f6ed6b0d
+
+	column 'Supplier ID'
+		dataType: string
+		lineageTag: 7849683d-dc5e-4855-82e7-c5d88b734ba8
+		summarizeBy: none
+		sourceColumn: Supplier ID
+
+	column 'Supplier Name'
+		dataType: string
+		lineageTag: e3715610-5e59-48e3-aea9-b1bfc10fb297
+		summarizeBy: none
+		sourceColumn: Supplier Name
+
+	column 'Origin Country'
+		dataType: string
+		lineageTag: fa884879-b627-4db8-869f-745af07d70d3
+		summarizeBy: none
+		sourceColumn: Origin Country
+
+	/// Internal supplier rating: a = reliable, b = average, c = weak.
+	column Tier
+		dataType: string
+		lineageTag: 20fc7dee-1a83-4c20-9683-4b56b3538564
+		summarizeBy: none
+		sourceColumn: Tier
+
+	column 'Payment Terms'
+		dataType: string
+		lineageTag: 7c3c5335-b1c3-445b-b48d-e7f869bbbc14
+		summarizeBy: none
+		sourceColumn: Payment Terms
+
+	column Region
+		dataType: string
+		lineageTag: 3881827a-7ce5-451f-9537-12c9479675a8
+		summarizeBy: none
+		sourceColumn: Region
+
+	column 'Port of Loading'
+		dataType: string
+		lineageTag: 05673829-da5f-4a40-a93e-2ee4a11a14f5
+		summarizeBy: none
+		sourceColumn: Port of Loading
+
+	column Incoterm
+		dataType: string
+		lineageTag: f0602c71-77d5-4926-8abb-edc7c816e398
+		summarizeBy: none
+		sourceColumn: Incoterm
+
+	partition Supplier = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_supplier.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Supplier ID", type text}, {"Supplier Name", type text}, {"Origin Country", type text}, {"Tier", type text}, {"Payment Terms", type text}, {"Region", type text}, {"Port of Loading", type text}, {"Incoterm", type text}}, "en-US")
+				in
+				    Typed

@@ -1,0 +1,112 @@
+/// Month-end stock by location and SKU, valued at landed cost, with days of cover and health status.
+table Stock
+	lineageTag: 303cfbc3-a448-4601-87fa-b0ecea169180
+
+	column 'Snapshot Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd-MMM-yyyy
+		lineageTag: e13db428-4585-4754-8068-a73f29f0052a
+		summarizeBy: none
+		sourceColumn: Snapshot Date
+
+	column 'Location ID'
+		dataType: string
+		isHidden
+		lineageTag: 6f48ecde-773e-4f90-8650-d7fc2cb19652
+		summarizeBy: none
+		sourceColumn: Location ID
+
+	column 'SKU ID'
+		dataType: string
+		isHidden
+		lineageTag: cce8e983-7fad-4d4b-88b7-fe20e14047a7
+		summarizeBy: none
+		sourceColumn: SKU ID
+
+	column 'Opening Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 78f27da9-e790-479d-82a9-310187c7aa6b
+		summarizeBy: sum
+		sourceColumn: Opening Cartons
+
+	column 'Receipts Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 729894eb-ad6b-4cbb-9b17-5aac5babdfb3
+		summarizeBy: sum
+		sourceColumn: Receipts Cartons
+
+	column 'Issues Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 2f1ea223-c8ad-486b-94b8-8f7546edbb95
+		summarizeBy: sum
+		sourceColumn: Issues Cartons
+
+	column 'Adjustment Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 94bb432c-21ee-4a35-9432-0bd5822983a1
+		summarizeBy: sum
+		sourceColumn: Adjustment Cartons
+
+	column 'Closing Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 7eeb1595-9c57-411a-ab43-c1a58fed2e05
+		summarizeBy: sum
+		sourceColumn: Closing Cartons
+
+	column 'Unit Cost USD'
+		dataType: double
+		formatString: \$#,##0.00
+		lineageTag: 94e54cc8-4ef3-40f2-8616-f4cabcddcbe3
+		summarizeBy: none
+		sourceColumn: Unit Cost USD
+
+	column 'Stock Value USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: afe0f33f-984d-456b-b9b5-4f0224dfa5c8
+		summarizeBy: sum
+		sourceColumn: Stock Value USD
+
+	column 'Days of Cover'
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: 72bc1edf-2ae4-4474-a53d-7dafb78b9ddd
+		summarizeBy: none
+		sourceColumn: Days of Cover
+
+	column 'Stock Status'
+		dataType: string
+		lineageTag: cd70ab70-b161-47d6-bc6d-48e25e09a9f6
+		summarizeBy: none
+		sortByColumn: 'Status Order'
+		sourceColumn: Stock Status
+
+	column 'Status Order'
+		dataType: int64
+		isHidden
+		lineageTag: 49259ad2-fd64-47f2-9f39-176853a301ac
+		summarizeBy: none
+		sourceColumn: Status Order
+
+	column 'Stock Norm Days'
+		dataType: string
+		lineageTag: 7c22025b-4e8b-43e3-bf6a-d7c8c787f74e
+		summarizeBy: none
+		sourceColumn: Stock Norm Days
+
+	partition Stock = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Binary.Decompress(File.Contents(DataFolder & "fact_stock_snapshot.csv.gz"), Compression.GZip), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Snapshot Date", type date}, {"Location ID", type text}, {"SKU ID", type text}, {"Opening Cartons", Int64.Type}, {"Receipts Cartons", Int64.Type}, {"Issues Cartons", Int64.Type}, {"Adjustment Cartons", Int64.Type}, {"Closing Cartons", Int64.Type}, {"Unit Cost USD", type number}, {"Stock Value USD", type number}, {"Days of Cover", type number}, {"Stock Status", type text}, {"Status Order", Int64.Type}, {"Stock Norm Days", type text}}, "en-US")
+				in
+				    Typed

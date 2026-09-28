@@ -1,0 +1,35 @@
+relationship Stock_Snapshot_Date_Date_Date
+	fromColumn: Stock.'Snapshot Date'
+	toColumn: Date.Date
+
+relationship Stock_Location_ID_Location_Location_ID
+	fromColumn: Stock.'Location ID'
+	toColumn: Location.'Location ID'
+
+relationship Stock_SKU_ID_Product_SKU_ID
+	fromColumn: Stock.'SKU ID'
+	toColumn: Product.'SKU ID'
+
+relationship Movements_Movement_Date_Date_Date
+	fromColumn: Movements.'Movement Date'
+	toColumn: Date.Date
+
+relationship Movements_Location_ID_Location_Location_ID
+	fromColumn: Movements.'Location ID'
+	toColumn: Location.'Location ID'
+
+relationship Movements_SKU_ID_Product_SKU_ID
+	fromColumn: Movements.'SKU ID'
+	toColumn: Product.'SKU ID'
+
+relationship Goods_Receipts_GRN_Date_Date_Date
+	fromColumn: 'Goods Receipts'.'GRN Date'
+	toColumn: Date.Date
+
+relationship Goods_Receipts_Warehouse_ID_Location_Location_ID
+	fromColumn: 'Goods Receipts'.'Warehouse ID'
+	toColumn: Location.'Location ID'
+
+relationship Goods_Receipts_SKU_ID_Product_SKU_ID
+	fromColumn: 'Goods Receipts'.'SKU ID'
+	toColumn: Product.'SKU ID'

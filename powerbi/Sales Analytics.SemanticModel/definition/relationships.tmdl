@@ -1,0 +1,35 @@
+relationship Sales_Date_Date_Date
+	fromColumn: Sales.Date
+	toColumn: Date.Date
+
+relationship Sales_SKU_ID_Product_SKU_ID
+	fromColumn: Sales.'SKU ID'
+	toColumn: Product.'SKU ID'
+
+relationship Sales_Location_ID_Location_Location_ID
+	fromColumn: Sales.'Location ID'
+	toColumn: Location.'Location ID'
+
+relationship Sales_Customer_ID_Customer_Customer_ID
+	fromColumn: Sales.'Customer ID'
+	toColumn: Customer.'Customer ID'
+
+relationship Sales_Channel_Channel_Channel
+	fromColumn: Sales.Channel
+	toColumn: Channel.Channel
+
+relationship Location_Country_Code_Market_Country_Code
+	fromColumn: Location.'Country Code'
+	toColumn: Market.'Country Code'
+
+relationship Target_Month_Date_Date_Date
+	fromColumn: Target.'Month Date'
+	toColumn: Date.Date
+
+relationship Target_Country_Code_Market_Country_Code
+	fromColumn: Target.'Country Code'
+	toColumn: Market.'Country Code'
+
+relationship Target_Channel_Channel_Channel
+	fromColumn: Target.Channel
+	toColumn: Channel.Channel

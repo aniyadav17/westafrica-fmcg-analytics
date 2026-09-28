@@ -1,0 +1,199 @@
+/// All report measures (the table itself holds no data).
+table KPI
+	lineageTag: b8cade33-eadb-46b9-b631-29bdc810dd70
+
+	/// Month-end stock at landed cost.
+	measure 'Stock Value' = SUM(Stock[Stock Value USD])
+		formatString: \$#,##0
+		displayFolder: 1. Stock
+		lineageTag: 19105b9d-4782-4efb-99a0-84358dd0a7ef
+
+	measure 'Stock Date' = EOMONTH(MAX('Date'[Date]), 0)
+		formatString: dd-MMM-yyyy
+		isHidden
+		displayFolder: 1. Stock
+		lineageTag: 816a4ff6-8032-41e7-84d5-a18d7e934b35
+
+	/// Stock at the month-end of the selected period.
+	measure 'Closing Stock Value' = VAR _d = [Stock Date] RETURN CALCULATE([Stock Value], REMOVEFILTERS('Date'), Stock[Snapshot Date] = _d)
+		formatString: \$#,##0
+		displayFolder: 1. Stock
+		lineageTag: 75953c5a-6c83-4c53-9685-23292d690cef
+
+	measure 'Closing Cartons' = VAR _d = [Stock Date] RETURN CALCULATE(SUM(Stock[Closing Cartons]), REMOVEFILTERS('Date'), Stock[Snapshot Date] = _d)
+		formatString: #,##0
+		displayFolder: 1. Stock
+		lineageTag: cd66f22e-ff03-4965-b54f-f4fa6043db28
+
+	measure 'Stock Lines' = VAR _d = [Stock Date] RETURN CALCULATE(COUNTROWS(Stock), REMOVEFILTERS('Date'), Stock[Snapshot Date] = _d)
+		formatString: #,##0
+		displayFolder: 1. Stock
+		lineageTag: bf37c2cc-bf9f-461d-b30d-af5149bfa3bc
+
+	measure 'SKUs Stocked' = VAR _d = [Stock Date] RETURN CALCULATE(DISTINCTCOUNT(Stock[SKU ID]), REMOVEFILTERS('Date'), Stock[Snapshot Date] = _d)
+		formatString: #,##0
+		displayFolder: 1. Stock
+		lineageTag: 5290cc65-f8c7-4088-b489-34a608f8a0c6
+
+	/// Cost value of stock issued (sold or transferred out).
+	measure 'Issues Value' = SUMX(Stock, Stock[Issues Cartons] * Stock[Unit Cost USD])
+		formatString: \$#,##0
+		displayFolder: 1. Stock
+		lineageTag: da6ea5af-be47-4121-b560-6e0f38920c32
+
+	measure 'Receipts Value' = SUMX(Stock, Stock[Receipts Cartons] * Stock[Unit Cost USD])
+		formatString: \$#,##0
+		displayFolder: 1. Stock
+		lineageTag: f1cb1979-35f4-4fb7-b2c0-1a33c586aaa0
+
+	measure 'Issues Value 3M' = VAR _d = [Stock Date] RETURN CALCULATE([Issues Value], REMOVEFILTERS('Date'), Stock[Snapshot Date] > EDATE(_d, -3), Stock[Snapshot Date] <= _d)
+		formatString: \$#,##0
+		isHidden
+		displayFolder: 1. Stock
+		lineageTag: b988322b-bb8f-4c77-902f-37144129069b
+
+	/// Closing stock divided by the average daily issue value of the last three months.
+	measure 'Days of Cover' = DIVIDE([Closing Stock Value], DIVIDE([Issues Value 3M], 91))
+		formatString: 0.0
+		displayFolder: 1. Stock
+		lineageTag: c677ca83-1c04-47ac-9072-95eed8bfca25
+
+	measure 'Stock Turns (12m)' = VAR _d = [Stock Date] VAR _iss = CALCULATE([Issues Value], REMOVEFILTERS('Date'), Stock[Snapshot Date] > EDATE(_d, -12), Stock[Snapshot Date] <= _d) VAR _avg = CALCULATE(AVERAGEX(VALUES(Stock[Snapshot Date]), [Stock Value]), REMOVEFILTERS('Date'), Stock[Snapshot Date] > EDATE(_d, -12), Stock[Snapshot Date] <= _d) RETURN DIVIDE(_iss, _avg)
+		formatString: #,##0.0
+		displayFolder: 1. Stock
+		lineageTag: 8e69e946-c992-45fc-a22b-ee6390487575
+
+	measure 'Out of Stock Lines' = CALCULATE([Stock Lines], KEEPFILTERS(Stock[Stock Status] = "Out of Stock"))
+		formatString: #,##0
+		displayFolder: 2. Health
+		lineageTag: 3c592750-aa5f-4341-8498-2f9f7b835c2a
+
+	measure 'Out of Stock %' = DIVIDE([Out of Stock Lines], [Stock Lines])
+		formatString: 0.0%
+		displayFolder: 2. Health
+		lineageTag: d84f9af9-3834-425c-8213-7bf833314afe
+
+	measure 'Low Stock Lines' = CALCULATE([Stock Lines], KEEPFILTERS(Stock[Stock Status] = "Low Stock"))
+		formatString: #,##0
+		displayFolder: 2. Health
+		lineageTag: 4bbf1aa6-eac6-4f05-9bb9-1512123c6abc
+
+	measure 'Healthy Lines' = CALCULATE([Stock Lines], KEEPFILTERS(Stock[Stock Status] = "Healthy"))
+		formatString: #,##0
+		displayFolder: 2. Health
+		lineageTag: fe83f528-039e-48b3-b807-2e67efab60bb
+
+	measure 'Healthy %' = DIVIDE([Healthy Lines], [Stock Lines])
+		formatString: 0.0%
+		displayFolder: 2. Health
+		lineageTag: a67afcf6-c2a7-48c2-ba70-d4d29118a1de
+
+	measure 'Overstock Value' = CALCULATE([Closing Stock Value], KEEPFILTERS(Stock[Stock Status] = "Overstock"))
+		formatString: \$#,##0
+		displayFolder: 2. Health
+		lineageTag: d9ccb737-5b3c-421a-9050-ebb0a3e8d9a7
+
+	/// Stock with more than the slow-moving norm of cover, or no movement at all.
+	measure 'Slow & Non-moving Value' = CALCULATE([Closing Stock Value], KEEPFILTERS(Stock[Stock Status] IN {"Slow-moving", "Non-moving"}))
+		formatString: \$#,##0
+		displayFolder: 2. Health
+		lineageTag: c7f8f975-87f5-4b21-ad4d-ea6b343567fb
+
+	measure 'Slow & Non-moving %' = DIVIDE([Slow & Non-moving Value], [Closing Stock Value])
+		formatString: 0.0%
+		displayFolder: 2. Health
+		lineageTag: 25915395-3143-40bf-bb11-5ddb9c0446dd
+
+	measure 'Share of Stock Value %' = DIVIDE([Closing Stock Value], CALCULATE([Closing Stock Value], ALLSELECTED()))
+		formatString: 0.0%
+		displayFolder: 2. Health
+		lineageTag: 03cca292-3b11-455c-ba19-00c196f86b8d
+
+	measure 'Movement Value' = SUM(Movements[Value USD])
+		formatString: \$#,##0
+		displayFolder: 3. Movements
+		lineageTag: 46593921-2102-4c64-8775-f4048e641ee0
+
+	measure 'Goods Received Value' = SUM('Goods Receipts'[Landed Value USD])
+		formatString: \$#,##0
+		displayFolder: 3. Movements
+		lineageTag: a280c83e-79c8-416b-93b2-893384c879c7
+
+	measure 'Inbound Cartons' = SUM('Goods Receipts'[Qty Received Cartons])
+		formatString: #,##0
+		displayFolder: 3. Movements
+		lineageTag: 98bfac84-c726-448c-9bdf-7d7a799c685b
+
+	measure 'Transfers to Stores' = CALCULATE([Movement Value], KEEPFILTERS(Movements[Movement Type] = "Transfer In"))
+		formatString: \$#,##0
+		displayFolder: 3. Movements
+		lineageTag: 7dd1c4de-13f1-4899-bdc9-ca8dffa4fb5c
+
+	/// Damage, expiry and stock-count adjustments.
+	measure 'Shrinkage Value' = -CALCULATE([Movement Value], KEEPFILTERS(Movements[Movement Type] = "Adjustment / Damage"))
+		formatString: \$#,##0
+		displayFolder: 3. Movements
+		lineageTag: 31e2877f-ed79-442b-8755-fb72f2f6bf6c
+
+	measure 'Shrinkage %' = DIVIDE([Shrinkage Value], [Issues Value])
+		formatString: 0.0%
+		displayFolder: 3. Movements
+		lineageTag: 906e14fd-ae5d-46e3-bc85-2b280fbd4390
+
+	measure 'Stock Value (USD m)' = DIVIDE([Closing Stock Value], 1000000)
+		formatString: \$0.00" m"
+		displayFolder: 4. Display
+		lineageTag: d5229b37-32c3-413d-a67e-29b8403e4a2a
+
+	measure 'Stock Value (USD k)' = DIVIDE([Closing Stock Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 4837c65e-94d7-49c5-906c-9b465dd2dbac
+
+	measure 'Month-End Stock (USD k)' = DIVIDE([Stock Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: ffaec9d6-2acb-4666-8393-a7f0855fe9a7
+
+	measure 'Slow & Non-moving (USD k)' = DIVIDE([Slow & Non-moving Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: a577f001-5f1a-4fe7-b198-994c66cc9bd8
+
+	measure 'Overstock (USD k)' = DIVIDE([Overstock Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: d68f8b88-ae12-4f8b-abf1-58ca2defbdad
+
+	measure 'Issues Value (USD k)' = DIVIDE([Issues Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 77008692-b859-4d01-8976-26598098b0c4
+
+	measure 'Receipts Value (USD k)' = DIVIDE([Receipts Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 6baa0360-3c43-4918-9655-900338cfe908
+
+	measure 'Goods Received (USD k)' = DIVIDE([Goods Received Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 1054dda2-23ed-42c3-80dc-f63a5f5e09dc
+
+	measure 'Shrinkage (USD k)' = DIVIDE([Shrinkage Value], 1000)
+		formatString: \$#,##0" k"
+		displayFolder: 4. Display
+		lineageTag: 843b5b9c-fa4e-4094-8cbc-b460a550bd2a
+
+	column KPI
+		dataType: string
+		isHidden
+		lineageTag: 77c9a25b-0975-4e7c-ae58-032bf0078cc5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [KPI]
+
+	partition KPI = calculated
+		mode: import
+		source =
+				ROW("KPI", BLANK())

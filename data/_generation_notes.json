@@ -1,0 +1,32 @@
+{
+  "company": "Atlantic Foods Trading Ltd.",
+  "seed": 42,
+  "period": "2021-04-01 to 2026-03-31",
+  "currency": "USD",
+  "row_counts": {
+    "sales": 240976,
+    "stock_movements": 180097,
+    "stock_snapshot": 59353,
+    "po_lines": 13447,
+    "purchase_orders": 1835,
+    "shipments": 1835,
+    "goods_receipts": 12907,
+    "landed_cost_rows": 11159,
+    "targets": 360,
+    "products": 132,
+    "customers": 218,
+    "locations": 11,
+    "suppliers": 17
+  },
+  "planted_patterns": [
+    "Container freight crisis 2021-22: freight index ~3x, landed-cost uplift peaks, then normalises through 2023",
+    "Red Sea disruption Jan-2024 to Sep-2024: +12 transit days from Asia, freight index rises again",
+    "Food commodity price spike FY 2022-23 (cost index +26%), selling prices follow with a lag -> margin dip",
+    "Supplier tiers: tier 'c' suppliers (Ningbo, Guangzhou, Delhi Rice) deliver late and short -> low OTIF",
+    "New stores: Kairaba Avenue (Dec-2021), Bo Town (Jan-2023), Paynesville (Oct-2023) ramp up over ~6 months",
+    "Ramadan / Eid demand lift on staples and beverages in the weeks before Eid each year",
+    "December festive peak on confectionery, biscuits, evaporated milk and cooking oil",
+    "Delisted SKUs late in the period leave slow / non-moving stock behind",
+    "Shipments still in transit or at port at 31-Mar-2026 (open import pipeline)"
+  ]
+}

@@ -1,0 +1,82 @@
+/// Inbound receipts from imports.
+table 'Goods Receipts'
+	lineageTag: a34596b7-b8e3-4ef2-ab6c-8384a5e4b623
+
+	column 'GRN No'
+		dataType: string
+		lineageTag: f8dc3fc2-ccf9-4955-a3da-48ffa46aa98f
+		summarizeBy: none
+		sourceColumn: GRN No
+
+	column 'GRN Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd-MMM-yyyy
+		lineageTag: ae2fb1f3-0ffc-48e6-a91e-8186e4dc427c
+		summarizeBy: none
+		sourceColumn: GRN Date
+
+	column 'PO No'
+		dataType: string
+		lineageTag: 882dd445-fbd9-4f77-a907-0fd8981617d2
+		summarizeBy: none
+		sourceColumn: PO No
+
+	column 'Shipment No'
+		dataType: string
+		lineageTag: 9ecbfd99-8b40-4473-8ee5-a92555ed29a1
+		summarizeBy: none
+		sourceColumn: Shipment No
+
+	column 'Warehouse ID'
+		dataType: string
+		isHidden
+		lineageTag: fabceacb-34c0-4e15-afe8-d68a6c269262
+		summarizeBy: none
+		sourceColumn: Warehouse ID
+
+	column 'SKU ID'
+		dataType: string
+		isHidden
+		lineageTag: 48a5f0b4-71af-4120-86b0-29d069dbf9e7
+		summarizeBy: none
+		sourceColumn: SKU ID
+
+	column 'Qty Ordered Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 30292cc7-d7df-4e20-b392-55755d8e21d9
+		summarizeBy: sum
+		sourceColumn: Qty Ordered Cartons
+
+	column 'Qty Received Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 16ed7302-4232-4d8c-b362-ca5b145aaaa6
+		summarizeBy: sum
+		sourceColumn: Qty Received Cartons
+
+	column 'Landed Unit Cost USD'
+		dataType: double
+		formatString: \$#,##0.00
+		lineageTag: 3229d967-3a12-417d-8483-b53d4102bc4a
+		summarizeBy: sum
+		sourceColumn: Landed Unit Cost USD
+
+	column 'Landed Value USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: dac56923-4bb5-4340-a850-69ba8fb19db6
+		summarizeBy: sum
+		sourceColumn: Landed Value USD
+
+	partition 'Goods Receipts' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fact_goods_receipts.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"GRN No", type text}, {"GRN Date", type date}, {"PO No", type text}, {"Shipment No", type text}, {"Warehouse ID", type text}, {"SKU ID", type text}, {"Qty Ordered Cartons", Int64.Type}, {"Qty Received Cartons", Int64.Type}, {"Landed Unit Cost USD", type number}, {"Landed Value USD", type number}}, "en-US")
+				in
+				    Typed

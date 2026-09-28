@@ -1,0 +1,63 @@
+/// B2B customers: wholesalers, retailers, HORECA and institutions.
+table Customer
+	lineageTag: d5e1c140-f759-4367-befb-da82946ce51e
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: 13ab165a-733b-41c0-b79b-33ec10497873
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+	column 'Customer Name'
+		dataType: string
+		lineageTag: eb0c854a-5fb0-4096-9ddb-3b86418c3003
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+	column Segment
+		dataType: string
+		lineageTag: 1116093f-8c58-4992-925e-408610393af5
+		summarizeBy: none
+		sourceColumn: Segment
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: 6c7f78a5-fe8b-470e-9466-83a3291a28ba
+		summarizeBy: none
+		sourceColumn: Country Code
+
+	column Country
+		dataType: string
+		lineageTag: e31636ea-a390-4df4-82c9-730fe9b13abd
+		summarizeBy: none
+		sourceColumn: Country
+
+	column City
+		dataType: string
+		lineageTag: a61ec05b-5dc7-40d6-9ca5-2c255ec0641b
+		summarizeBy: none
+		sourceColumn: City
+
+	column 'Credit Days'
+		dataType: int64
+		lineageTag: c4cf3ea4-ed89-49bc-afc2-07e7437ea7f8
+		summarizeBy: none
+		sourceColumn: Credit Days
+
+	column Status
+		dataType: string
+		lineageTag: e32644ce-dd60-42a3-aba7-e5537593b42e
+		summarizeBy: none
+		sourceColumn: Status
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_customer.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Customer ID", type text}, {"Customer Name", type text}, {"Segment", type text}, {"Country Code", type text}, {"Country", type text}, {"City", type text}, {"Credit Days", Int64.Type}, {"Status", type text}}, "en-US")
+				in
+				    Typed

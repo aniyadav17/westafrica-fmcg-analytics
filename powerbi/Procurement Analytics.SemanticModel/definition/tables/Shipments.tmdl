@@ -1,0 +1,226 @@
+/// Container shipments: sailing, arrival, customs clearance and landed value.
+table Shipments
+	lineageTag: 571f5be6-38ef-4ed8-8b24-929932b5a6de
+
+	/// Actual arrival, or the expected arrival while the shipment is still open. Used to place every shipment on the calendar.
+	column 'Arrival Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd-MMM-yyyy
+		lineageTag: 5bc02ce0-d870-4085-bed4-90405383889f
+		summarizeBy: none
+		sourceColumn: Arrival Date
+
+	column 'Shipment No'
+		dataType: string
+		lineageTag: 1ccb680a-5d2a-4bae-aa19-1423be9d274a
+		summarizeBy: none
+		sourceColumn: Shipment No
+
+	column 'PO No'
+		dataType: string
+		lineageTag: b1acce1b-9104-48d5-882c-5a899b4bc6ed
+		summarizeBy: none
+		sourceColumn: PO No
+
+	column 'Supplier ID'
+		dataType: string
+		isHidden
+		lineageTag: 6651b6c3-bb68-472b-900d-e6c8688be244
+		summarizeBy: none
+		sourceColumn: Supplier ID
+
+	column 'Supplier Name'
+		dataType: string
+		lineageTag: 41b38d54-1e97-4173-8614-8a5f743bf71a
+		summarizeBy: none
+		sourceColumn: Supplier Name
+
+	column 'Origin Country'
+		dataType: string
+		lineageTag: 70b022e3-af58-4775-b1fb-1f99fe0cea68
+		summarizeBy: none
+		sourceColumn: Origin Country
+
+	column 'Port of Loading'
+		dataType: string
+		lineageTag: 83998974-479e-4713-a3b8-ca081c9f8ed5
+		summarizeBy: none
+		sourceColumn: Port of Loading
+
+	column 'Port of Discharge'
+		dataType: string
+		lineageTag: f3b2aa86-2b30-49ec-9c2e-9c665e630da6
+		summarizeBy: none
+		sourceColumn: Port of Discharge
+
+	column 'Warehouse ID'
+		dataType: string
+		isHidden
+		lineageTag: fd728542-0e09-4e96-a877-ff5f6da608a4
+		summarizeBy: none
+		sourceColumn: Warehouse ID
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: daae16f0-3ca6-4f3a-86c4-30db6728590f
+		summarizeBy: none
+		sourceColumn: Country Code
+
+	column Country
+		dataType: string
+		lineageTag: 52bee315-e001-4a3f-9698-b0d6aaa395e8
+		summarizeBy: none
+		sourceColumn: Country
+
+	column Containers
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 0b9306cf-0faa-447f-a9a7-9b466d225880
+		summarizeBy: sum
+		sourceColumn: Containers
+
+	column 'Container Type'
+		dataType: string
+		lineageTag: fc0c08b6-796e-4cab-a2fc-f3255e659452
+		summarizeBy: none
+		sourceColumn: Container Type
+
+	column CBM
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: 2c72d1ba-2951-4eec-a8cc-ceb874c5d262
+		summarizeBy: sum
+		sourceColumn: CBM
+
+	column 'Qty Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 109a29b0-87dc-41b9-9257-dad2c04178ba
+		summarizeBy: sum
+		sourceColumn: Qty Cartons
+
+	column ETD
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: 0465f959-031d-43d4-a0a8-85f800cd80e5
+		summarizeBy: none
+		sourceColumn: ETD
+
+	column ATD
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: e3922849-3044-4bbc-95ad-25bc53336d21
+		summarizeBy: none
+		sourceColumn: ATD
+
+	column ETA
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: 00397196-0eb3-45ca-b71b-440dfdc0faa9
+		summarizeBy: none
+		sourceColumn: ETA
+
+	column ATA
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: 87bdce0f-66db-4fcb-8035-844d97adffff
+		summarizeBy: none
+		sourceColumn: ATA
+
+	column 'Customs Cleared Date'
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: f9bb356e-cebd-44dd-b9cd-ed847bf624f6
+		summarizeBy: none
+		sourceColumn: Customs Cleared Date
+
+	column 'Warehouse Receipt Date'
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: 041d6a72-8147-4cb1-9473-5a2a24a11e94
+		summarizeBy: none
+		sourceColumn: Warehouse Receipt Date
+
+	column 'Transit Days'
+		dataType: int64
+		lineageTag: ccd4ccf6-fa18-4f9b-9070-d762e6f696f6
+		summarizeBy: none
+		sourceColumn: Transit Days
+
+	column 'Clearance Days'
+		dataType: int64
+		lineageTag: 677461d7-1e6c-4c42-aa84-da3ff63c84b1
+		summarizeBy: none
+		sourceColumn: Clearance Days
+
+	column 'Total Lead Time Days'
+		dataType: int64
+		lineageTag: 20571189-3c28-4502-9587-d221e28ba46c
+		summarizeBy: none
+		sourceColumn: Total Lead Time Days
+
+	column 'Delay Days'
+		dataType: int64
+		lineageTag: 9734ef0c-660e-48c1-885f-0e22d0be4646
+		summarizeBy: none
+		sourceColumn: Delay Days
+
+	column 'On Time'
+		dataType: boolean
+		lineageTag: 2516d6e1-0f8f-41e7-a4f2-6529e4781516
+		summarizeBy: none
+		sourceColumn: On Time
+
+	column 'In Full'
+		dataType: boolean
+		lineageTag: 28aa5721-f16f-49d7-b89c-9ce044539db3
+		summarizeBy: none
+		sourceColumn: In Full
+
+	column OTIF
+		dataType: boolean
+		lineageTag: 1d85cf3b-060e-49ff-8485-45a1dd87e479
+		summarizeBy: none
+		sourceColumn: OTIF
+
+	column 'FOB Value USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: 21997890-597d-42b8-bd41-71092d5a542a
+		summarizeBy: sum
+		sourceColumn: FOB Value USD
+
+	column 'Landed Value USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: 73a61fb1-2764-4730-9c49-47ee9617560f
+		summarizeBy: sum
+		sourceColumn: Landed Value USD
+
+	column 'Landed Cost Uplift Pct'
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: fa76de27-cab8-4f7b-b574-bab7013adaf1
+		summarizeBy: none
+		sourceColumn: Landed Cost Uplift Pct
+
+	column Status
+		dataType: string
+		lineageTag: 8f2f6ab6-4045-4274-86c7-1e45edf7a4c9
+		summarizeBy: none
+		sourceColumn: Status
+
+	partition Shipments = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fact_shipments.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Blanks = Table.ReplaceValue(Renamed, "", null, Replacer.ReplaceValue, {"ATA", "Customs Cleared Date", "Warehouse Receipt Date", "Transit Days", "Clearance Days", "Total Lead Time Days", "Delay Days", "On Time", "In Full", "OTIF"}),
+				    Added1 = Table.AddColumn(Blanks, "Arrival Date", each if [ATA] <> null then [ATA] else [ETA]),
+				    Typed = Table.TransformColumnTypes(Added1, {{"Arrival Date", type date}, {"Shipment No", type text}, {"PO No", type text}, {"Supplier ID", type text}, {"Supplier Name", type text}, {"Origin Country", type text}, {"Port of Loading", type text}, {"Port of Discharge", type text}, {"Warehouse ID", type text}, {"Country Code", type text}, {"Country", type text}, {"Containers", Int64.Type}, {"Container Type", type text}, {"CBM", type number}, {"Qty Cartons", Int64.Type}, {"ETD", type date}, {"ATD", type date}, {"ETA", type date}, {"ATA", type date}, {"Customs Cleared Date", type date}, {"Warehouse Receipt Date", type date}, {"Transit Days", Int64.Type}, {"Clearance Days", Int64.Type}, {"Total Lead Time Days", Int64.Type}, {"Delay Days", Int64.Type}, {"On Time", type logical}, {"In Full", type logical}, {"OTIF", type logical}, {"FOB Value USD", type number}, {"Landed Value USD", type number}, {"Landed Cost Uplift Pct", type number}, {"Status", type text}}, "en-US")
+				in
+				    Typed

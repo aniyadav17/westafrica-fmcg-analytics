@@ -1,0 +1,23 @@
+/// Countries of operation (shared by sales and budget).
+table Market
+	lineageTag: eaf4cdb1-95d0-41de-978a-b9edf37f7d4c
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: 67fd67e4-63dc-4a38-867b-7655632bb657
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Country Code]
+
+	column Market
+		dataType: string
+		lineageTag: 7e78e626-fca0-4f03-9615-0c75e8616226
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Market]
+
+	partition Market = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS(SUMMARIZE(Location, Location[Country Code], Location[Country]), "Country Code", Location[Country Code], "Market", Location[Country])

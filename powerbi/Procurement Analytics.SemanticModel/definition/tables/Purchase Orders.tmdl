@@ -1,0 +1,124 @@
+/// Import purchase orders (one row per PO).
+table 'Purchase Orders'
+	lineageTag: 3512f0bc-809d-47b9-b128-130f3d267874
+
+	column 'PO No'
+		dataType: string
+		lineageTag: 26da1ce2-8838-4844-a904-34bb7497c091
+		summarizeBy: none
+		sourceColumn: PO No
+
+	column 'PO Date'
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: 95e3fc6c-d38b-4d34-8773-53de601835ab
+		summarizeBy: none
+		sourceColumn: PO Date
+
+	column 'Supplier ID'
+		dataType: string
+		isHidden
+		lineageTag: 6f376171-0d65-4b29-a3dd-a8ac202fb864
+		summarizeBy: none
+		sourceColumn: Supplier ID
+
+	column 'Supplier Name'
+		dataType: string
+		lineageTag: e3e5dda4-d1ad-4714-854b-d804b5ef9401
+		summarizeBy: none
+		sourceColumn: Supplier Name
+
+	column 'Origin Country'
+		dataType: string
+		lineageTag: 756e01da-d5d8-405e-9477-fd0705b984a2
+		summarizeBy: none
+		sourceColumn: Origin Country
+
+	column Incoterm
+		dataType: string
+		lineageTag: 51622667-096c-4f6c-bf02-211821160ffe
+		summarizeBy: none
+		sourceColumn: Incoterm
+
+	column 'Payment Terms'
+		dataType: string
+		lineageTag: b01f7cc2-53be-463f-b47c-fe0f375e57d4
+		summarizeBy: none
+		sourceColumn: Payment Terms
+
+	column 'Warehouse ID'
+		dataType: string
+		isHidden
+		lineageTag: 1c61cea8-f008-4a30-adc7-0e3fe2d04c4a
+		summarizeBy: none
+		sourceColumn: Warehouse ID
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: b9ea4960-1933-4b81-8ab8-04d6a84c38d8
+		summarizeBy: none
+		sourceColumn: Country Code
+
+	column Country
+		dataType: string
+		lineageTag: 94d54062-244d-471d-bb06-7843a3ff860a
+		summarizeBy: none
+		sourceColumn: Country
+
+	column Lines
+		dataType: int64
+		lineageTag: 5286796a-81b1-4785-b2ff-d3d197fcd646
+		summarizeBy: sum
+		sourceColumn: Lines
+
+	column 'Qty Ordered Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: ff2a3853-9435-4a97-8026-684787cbed41
+		summarizeBy: sum
+		sourceColumn: Qty Ordered Cartons
+
+	column 'FOB Value USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: cf930402-9507-4222-a850-dfaf4d43a15d
+		summarizeBy: sum
+		sourceColumn: FOB Value USD
+
+	column Containers
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 0ddec591-75d5-4f2b-a98b-55e991523091
+		summarizeBy: sum
+		sourceColumn: Containers
+
+	column CBM
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: ff027e4b-94df-47b2-852d-4304e0ff9e1d
+		summarizeBy: sum
+		sourceColumn: CBM
+
+	column 'Shipment No'
+		dataType: string
+		lineageTag: e8edc576-be23-4edb-ab04-ae1553926320
+		summarizeBy: none
+		sourceColumn: Shipment No
+
+	column Status
+		dataType: string
+		lineageTag: 7ea3aa81-98e8-463a-b948-8fea86a88cb7
+		summarizeBy: none
+		sourceColumn: Status
+
+	partition 'Purchase Orders' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fact_purchase_orders.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"PO No", type text}, {"PO Date", type date}, {"Supplier ID", type text}, {"Supplier Name", type text}, {"Origin Country", type text}, {"Incoterm", type text}, {"Payment Terms", type text}, {"Warehouse ID", type text}, {"Country Code", type text}, {"Country", type text}, {"Lines", Int64.Type}, {"Qty Ordered Cartons", Int64.Type}, {"FOB Value USD", type number}, {"Containers", Int64.Type}, {"CBM", type number}, {"Shipment No", type text}, {"Status", type text}}, "en-US")
+				in
+				    Typed

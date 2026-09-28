@@ -1,0 +1,90 @@
+/// Calendar Apr-2021 to Mar-2026 with financial year (Apr-Mar).
+table Date
+	lineageTag: 3e7a8f28-514f-4835-b474-e3bc0f8105a1
+	dataCategory: Time
+
+	column Date
+		isUnique
+		dataType: dateTime
+		formatString: dd-MMM-yyyy
+		lineageTag: 41b203a0-f657-435b-9798-1bffd42197d4
+		summarizeBy: none
+		sourceColumn: Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 045ef617-9d5f-4304-ade4-458182eccb98
+		summarizeBy: none
+		sourceColumn: Year
+
+	column 'Month No'
+		dataType: int64
+		isHidden
+		lineageTag: e189ef06-63d3-47df-b65d-ce752c62f6ac
+		summarizeBy: none
+		sourceColumn: Month No
+
+	column Month
+		dataType: string
+		lineageTag: 61e0d5b8-64db-43ae-bc0d-461c1a7d04a3
+		summarizeBy: none
+		sortByColumn: 'Month No'
+		sourceColumn: Month
+
+	column 'Month Year'
+		dataType: string
+		lineageTag: 7b640593-73f7-43aa-91ed-0c5001fbaaa3
+		summarizeBy: none
+		sortByColumn: 'Month Year Sort'
+		sourceColumn: Month Year
+
+	column 'Month Year Sort'
+		dataType: int64
+		isHidden
+		lineageTag: 4a5fe298-83fe-48df-b5b7-ce1748e38b60
+		summarizeBy: none
+		sourceColumn: Month Year Sort
+
+	column 'Month Start'
+		dataType: dateTime
+		formatString: MMM-yyyy
+		lineageTag: bc94be3c-64de-4efb-a04f-1f41051151bc
+		summarizeBy: none
+		sourceColumn: Month Start
+
+	column Quarter
+		dataType: string
+		lineageTag: 9136a508-f9a7-4b57-82a3-62861e1d48ac
+		summarizeBy: none
+		sourceColumn: Quarter
+
+	column 'Financial Year'
+		dataType: string
+		lineageTag: 0234fe63-54bf-4bec-989d-122cf2c08f26
+		summarizeBy: none
+		sourceColumn: Financial Year
+
+	column 'FY Quarter'
+		dataType: string
+		lineageTag: 2f030a64-758e-4e1a-8d9e-be0c3835de9b
+		summarizeBy: none
+		sourceColumn: FY Quarter
+
+	column 'FY Month No'
+		dataType: int64
+		isHidden
+		lineageTag: cf9e3578-e916-4dfd-9347-9b1338e6fc32
+		summarizeBy: none
+		sourceColumn: FY Month No
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_date.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Date", type date}, {"Year", Int64.Type}, {"Month No", Int64.Type}, {"Month", type text}, {"Month Year", type text}, {"Month Year Sort", Int64.Type}, {"Month Start", type date}, {"Quarter", type text}, {"Financial Year", type text}, {"FY Quarter", type text}, {"FY Month No", Int64.Type}}, "en-US")
+				in
+				    Typed

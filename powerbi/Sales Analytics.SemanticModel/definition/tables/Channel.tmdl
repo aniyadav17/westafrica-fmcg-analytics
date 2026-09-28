@@ -1,0 +1,15 @@
+/// Route to market.
+table Channel
+	lineageTag: 1c878586-2e60-491f-90b1-5e67bb10f9b6
+
+	column Channel
+		dataType: string
+		lineageTag: 3e6b6305-72e8-41cc-b51a-5af2d172e11a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Channel]
+
+	partition Channel = calculated
+		mode: import
+		source =
+				DATATABLE("Channel", STRING, {{"B2B"}, {"Supermarket"}})

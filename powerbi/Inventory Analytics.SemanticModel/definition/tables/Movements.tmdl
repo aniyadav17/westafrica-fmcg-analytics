@@ -1,0 +1,62 @@
+/// Stock ledger: goods receipts, warehouse-to-store transfers and adjustments (sales issues are in the sales model).
+table Movements
+	lineageTag: f9fe4c8b-5a5d-40bc-b557-17965d27c16d
+
+	column 'Movement Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd-MMM-yyyy
+		lineageTag: 7b5f421b-56c8-4da5-a2d9-1bd531616691
+		summarizeBy: none
+		sourceColumn: Movement Date
+
+	column 'Movement Type'
+		dataType: string
+		lineageTag: 9e19f8e3-b495-42d4-827f-95c2c9399c63
+		summarizeBy: none
+		sourceColumn: Movement Type
+
+	column 'Location ID'
+		dataType: string
+		isHidden
+		lineageTag: 6399680c-d016-4f06-97e9-a4fbb0ec5edf
+		summarizeBy: none
+		sourceColumn: Location ID
+
+	column 'SKU ID'
+		dataType: string
+		isHidden
+		lineageTag: 0b4aa30c-4595-47c4-b6ce-ab1e1c4611f0
+		summarizeBy: none
+		sourceColumn: SKU ID
+
+	column 'Qty Cartons'
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 33b1f1dd-ebe0-4c93-9456-389229f19b36
+		summarizeBy: sum
+		sourceColumn: Qty Cartons
+
+	column 'Value USD'
+		dataType: double
+		formatString: \$#,##0
+		lineageTag: 40943b60-8763-409c-a86b-ce1b6b5a2b04
+		summarizeBy: sum
+		sourceColumn: Value USD
+
+	column Reference
+		dataType: string
+		lineageTag: f6e402e3-9d0d-4cbe-94a3-09fc2f3b842d
+		summarizeBy: none
+		sourceColumn: Reference
+
+	partition Movements = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Binary.Decompress(File.Contents(DataFolder & "fact_stock_movements.csv.gz"), Compression.GZip), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Renamed = Table.TransformColumnNames(Headers, each Text.Replace(_, "_", " ")),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Movement Date", type date}, {"Movement Type", type text}, {"Location ID", type text}, {"SKU ID", type text}, {"Qty Cartons", Int64.Type}, {"Value USD", type number}, {"Reference", type text}}, "en-US")
+				in
+				    Typed
