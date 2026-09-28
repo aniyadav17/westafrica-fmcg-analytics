@@ -143,6 +143,10 @@ tools/      pbip_lib.py, build_powerbi.py, validate_pbip.py
 screenshots/
 ```
 
+## Screenshots
+
+Page screenshots live in [screenshots/](screenshots) — see the note there for the suggested set.
+
 ## Documentation
 
 - [Data dictionary](docs/data-dictionary.md) — every table and column
